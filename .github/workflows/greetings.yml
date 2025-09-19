@@ -1,0 +1,21 @@
+name: Greetings
+
+on: [pull_request_target, issues]
+
+jobs:
+  greeting:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/first-interaction@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          issue-message: |
+            👋 Hey there! Thanks for opening your first issue in this project.
+            Please provide as many details as possible about your ESP32 setup, DHT sensor, and any error messages so we can better help you.
+          pr-message: |
+            🎉 Thank you for your first contribution!
+            The team will review your pull request as soon as possible.  
+            We really appreciate your help in improving this ESP32 + DHT web server project!

@@ -1,0 +1,16 @@
+name: C++ Lint
+
+on:
+  pull_request:
+    branches: [ "develop", "main" ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install clang-format
+        run: sudo apt-get install -y clang-format
+      - name: Run clang-format
+        run: |
+          find . -iname '*.c' -o -iname '*.cpp' -o -iname '*.h' | xargs clang-format -i

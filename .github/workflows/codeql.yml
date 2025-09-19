@@ -1,4 +1,4 @@
-name: "CodeQL Advanced"
+name: "CodeQL Analysis"
 
 on:
   push:
@@ -10,8 +10,8 @@ on:
 
 jobs:
   analyze:
-    name: Analyze (${{ matrix.language }})
-    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
+    name: Analyze C/C++
+    runs-on: ubuntu-latest
 
     permissions:
       security-events: write
@@ -19,56 +19,17 @@ jobs:
       actions: read
       contents: read
 
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - language: c-cpp
-            build-mode: manual
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
-      - name: Install build dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            python3 python3-pip git cmake ninja-build ccache flex bison gperf
-            
-      - name: Cache ESP-IDF
-        uses: actions/cache@v3
-        with:
-          path: ~/esp
-          key: ${{ runner.os }}-esp-idf-v5.1.2
-          restore-keys: |
-            ${{ runner.os }}-esp-idf-
-            
-      - name: Install ESP-IDF
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          mkdir -p $HOME/esp
-          cd $HOME/esp
-          echo "Downloading ESP-IDF..."
-          git clone --depth 1 --branch v5.1.2 https://github.com/espressif/esp-idf.git
-          cd esp-idf
-          ./install.sh
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
-          languages: ${{ matrix.language }}
-          build-mode: ${{ matrix.build-mode }}
+          languages: c-cpp
+          build-mode: none
 
-      - if: matrix.build-mode == 'manual'
-        name: Build with ESP-IDF
-        shell: bash
-        run: |
-          echo "Setting up ESP-IDF environment..."
-          . $HOME/esp/esp-idf/export.sh
-          idf.py build
-          
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
         with:
-          category: "/language:${{ matrix.language }}"
+          category: "/language:c-cpp"
